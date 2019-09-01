@@ -1,0 +1,43 @@
+version: '3.7'
+# https://testdriven.io/blog/dockerizing-django-with-postgres-gunicorn-and-nginx/
+services:
+  web:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./app/:/usr/src/app/
+    ports:
+      - 8000:8000
+    environment:
+      - DEBUG=1
+      - SECRET_KEY=secret
+      - SQL_PASSWORD=example
+      - DATABASE=postgres
+      - SQL_HOST=db  
+      - SQL_PORT=5432
+      - SQL_DATABASE=example_db
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    volumes:
+      - ./postgres_data:/var/lib/postgresql/data/
+
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_DB: example_db
+    ports:
+      - 5432:5432   
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+
+volumes:
+  postgres_data:
+
+
